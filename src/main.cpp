@@ -149,6 +149,7 @@ uint8_t calcDATAtoBG(uint16_t colorData);
 uint16_t calcColorAddToData(uint8_t colorToAdd, uint8_t colorPos, uint16_t dataNow);
 void clearChars(uint16_t startCh, uint16_t endCh);
 void processZnak(char znak, uint16_t xyz);
+void carriageReturn();
 
 void setup(){
     Serial.begin(115200);
@@ -173,9 +174,9 @@ void processSerial(){
         char znak = Serial.read();
         uint16_t xyz = calcXYtoNR(tft.getCursorX(), tft.getCursorY());
         switch((int)znak){
-            case 10: //Enter/line feed
-                strzalka('B',1);
-                tft.setCursor(0,tft.getCursorY(), czcionka);
+            case 13: //Enter/CR
+                if(DEBUGMODE == true)Serial.print("CR;");
+                carriageReturn();
                 break;
             case 17:
                 break;
@@ -561,6 +562,13 @@ void irTab(){
         ZNAKI[i] = 0;
         WYSWIETLONE[i] = false;
     }
+}
+
+void carriageReturn(){
+    uint16_t gdzie = calcXYtoNR(tft.getCursorX(), tft.getCursorY());
+    int16_t x,y;
+    calcNRtoXY(gdzie, &x, &y);
+    tft.setCursor(1,(y+wz),czcionka);
 }
 
 // uint8_t reverseColorMan(uint16_t x){
